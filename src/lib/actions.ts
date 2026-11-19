@@ -1,5 +1,5 @@
 "use server";
-
+import { signLearnerId } from "@/lib/session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -68,7 +68,7 @@ export async function startProgramme(formData: FormData) {
     .returning({ id: learners.id });
 
   const store = await cookies();
-  store.set(LEARNER_COOKIE, String(learner.id), COOKIE_OPTIONS);
+  store.set(LEARNER_COOKIE, signLearnerId(learner.id), COOKIE_OPTIONS);
   redirect("/dashboard");
 }
 
@@ -84,7 +84,7 @@ export async function demoLogin() {
   if (!demo) redirect("/start");
 
   const store = await cookies();
-  store.set(LEARNER_COOKIE, String(demo.id), COOKIE_OPTIONS);
+  store.set(LEARNER_COOKIE, signLearnerId(demo.id), COOKIE_OPTIONS);
   redirect("/dashboard");
 }
 
@@ -329,7 +329,7 @@ export async function saveProfile(formData: FormData) {
     .onConflictDoUpdate({ target: learnerProfiles.learnerId, set: profileValues });
 
   const store = await cookies();
-  store.set(LEARNER_COOKIE, String(learnerId), COOKIE_OPTIONS);
+  store.set(LEARNER_COOKIE, signLearnerId(learnerId), COOKIE_OPTIONS);
   revalidatePath("/dashboard");
   revalidatePath("/profile");
   redirect("/dashboard?profile=saved");
